@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart-Growth Lab - Virtual Laboratory Pertumbuhan & Perkembangan Tumbuhan</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN untuk Grafik -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome untuk Ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #10b981;
+            border-radius: 4px;
+        }
+        .tab-btn.active {
+            border-bottom: 3px solid #059669;
+            color: #059669;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen text-slate-800 bg-slate-50">
+
+    <!-- HEADER & NAVBAR -->
+    <header class="bg-gradient-to-r from-emerald-800 via-teal-700 to-emerald-900 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Brand Title -->
+                <div class="flex items-center space-x-3">
+                    <div class="bg-white/10 p-2.5 rounded-xl backdrop-blur-md border border-white/20">
+                        <i class="fa-solid fa-seedling text-emerald-300 text-2xl sm:text-3xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+                            Smart-Growth Lab
+                            <span class="text-xs font-semibold bg-emerald-500/30 text-emerald-200 px-2.5 py-0.5 rounded-full border border-emerald-400/30">VLab v1.0</span>
+                        </h1>
+                        <p class="text-xs sm:text-sm text-emerald-100 font-light hidden sm:block">
+                            Virtual Laboratory Pertumbuhan & Perkembangan Tumbuhan
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Teacher Profile Info -->
+                <div class="hidden md:flex items-center space-x-3 bg-emerald-950/40 px-4 py-2 rounded-xl border border-emerald-500/20">
+                    <div class="w-9 h-9 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-white shadow">
+                        M
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xs text-emerald-200">Pengembang / Guru:</div>
+                        <div class="text-xs font-semibold text-white">Mirzawati, S.Pd.</div>
+                        <div class="text-[10px] text-emerald-300">MTsN 5 Bireuen</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <nav class="flex space-x-1 sm:space-x-4 border-t border-emerald-600/40 overflow-x-auto no-scrollbar">
+                <button onclick="switchTab('lab')" id="tab-lab" class="tab-btn active px-4 py-3 text-sm font-medium text-white hover:text-emerald-200 transition flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-flask"></i> Laboratorium Virtual
+                </button>
+                <button onclick="switchTab('teori')" id="tab-teori" class="tab-btn px-4 py-3 text-sm font-medium text-emerald-100 hover:text-white transition flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-book-open"></i> Panduan & Teori
+                </button>
+                <button onclick="switchTab('data')" id="tab-data" class="tab-btn px-4 py-3 text-sm font-medium text-emerald-100 hover:text-white transition flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-chart-line"></i> Data Logger & Grafik
+                </button>
+                <button onclick="switchTab('kuis')" id="tab-kuis" class="tab-btn px-4 py-3 text-sm font-medium text-emerald-100 hover:text-white transition flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-list-check"></i> Evaluasi & Kuis
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-6">
+
+        <!-- ================= SECTION 1: SIMULASI VIRTUAL LAB ================= -->
+        <section id="section-lab" class="space-y-6">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- CONTROL PANEL (KIRI) -->
+                <div class="lg:col-span-4 bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-5">
+                    <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+                        <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-emerald-600"></i> Kontrol Variabel
+                        </h2>
+                        <span class="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded font-medium">Bebas & Terkontrol</span>
+                    </div>
+
+                    <!-- Input 1: Jenis Biji -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                            1. Jenis Biji (Tipe Perkecambahan)
+                        </label>
+                        <select id="param-biji" onchange="resetSimulasi()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl p-2.5 focus:ring-emerald-500 focus:border-emerald-500 transition">
+                            <option value="kacang_hijau">Kacang Hijau (Perkecambahan Epigeal)</option>
+                            <option value="jagung">Jagung (Perkecambahan Hipogeal)</option>
+                        </select>
+                    </div>
+
+                    <!-- Input 2: Intensitas Cahaya -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                            2. Intensitas Cahaya
+                        </label>
+                        <select id="param-cahaya" onchange="resetSimulasi()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl p-2.5 focus:ring-emerald-500 focus:border-emerald-500 transition">
+                            <option value="gelap">Gelap / Tanpa Cahaya (Kondisi Etiolasi)</option>
+                            <option value="remang">Remang-remang (Cahaya Sedang)</option>
+                            <option value="terang" selected>Terang (Cahaya Optimal / Matahari)</option>
+                        </select>
+                    </div>
+
+                    <!-- Input 3: Kelembaban / Air -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                            3. Kadar Air / Kelembaban Media
+                        </label>
+                        <select id="param-air" onchange="resetSimulasi()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl p-2.5 focus:ring-emerald-500 focus:border-emerald-500 transition">
+                            <option value="kering">Kering / Sangat Minum Air (Rendah)</option>
+                            <option value="sedang" selected>Lembab / Cukup Air (Optimal)</option>
+                            <option value="tinggi">Tergenang Air (Berlebih/Anaerob)</option>
+                        </select>
+                    </div>
+
+                    <!-- Input 4: Suhu Lingkungan -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                            4. Suhu Lingkungan (°C)
+                        </label>
+                        <select id="param-suhu" onchange="resetSimulasi()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl p-2.5 focus:ring-emerald-500 focus:border-emerald-500 transition">
+                            <option value="dingin">Suhu Dingin (10 °C)</option>
+                            <option value="optimal" selected>Suhu Optimal (25 °C - 30 °C)</option>
+                            <option value="panas">Suhu Panas / Ekstrem (42 °C)</option>
+                        </select>
+                    </div>
+
+                    <!-- Input 5: Nutrisi / Pupuk -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                            5. Dosis Nutrisi (NPK)
+                        </label>
+                        <select id="param-nutrisi" onchange="resetSimulasi()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl p-2.5 focus:ring-emerald-500 focus:border-emerald-500 transition">
+                            <option value="tanpa">Tanpa Nutrisi Tambahan</option>
+                            <option value="cukup" selected>Dosis NPK Cukup (Optimal)</option>
+                            <option value="berlebih">Dosis NPK Berlebih (Toksisitas)</option>
+                        </select>
+                    </div>
+
+                    <!-- TOMBOL SIMULASI -->
+                    <div class="pt-2 space-y-2">
+                        <div class="grid grid-cols-2 gap-2">
+                            <button id="btn-start" onclick="toggleSimulasi()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-play" id="icon-start"></i> <span id="text-start">Mulai</span>
+                            </button>
+                            <button onclick="resetSimulasi()" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-rotate-left"></i> Reset
+                            </button>
+                        </div>
+                        
+                        <!-- Speed Control -->
+                        <div class="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                            <span class="text-xs font-medium text-slate-600">Kecepatan Hari:</span>
+                            <div class="flex gap-1">
+                                <button onclick="setSpeed(1000)" id="spd-1" class="px-2.5 py-1 text-xs rounded-lg font-bold bg-emerald-600 text-white">1x</button>
+                                <button onclick="setSpeed(500)" id="spd-2" class="px-2.5 py-1 text-xs rounded-lg font-bold bg-slate-200 text-slate-700">2x</button>
+                                <button onclick="setSpeed(250)" id="spd-3" class="px-2.5 py-1 text-xs rounded-lg font-bold bg-slate-200 text-slate-700">4x</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ANIMASI & REALTIME MONITOR (KANAN) -->
+                <div class="lg:col-span-8 flex flex-col space-y-6">
+                    
+                    <!-- CANVAS SIMULASI -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 relative overflow-hidden flex flex-col items-center">
+                        <!-- Top Bar Status -->
+                        <div class="w-full flex justify-between items-center mb-3 px-2">
+                            <div class="flex items-center gap-2">
+                                <span id="badge-status" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Siap Dijalankan
+                                </span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs text-slate-500 font-medium">Waktu Pengamatan:</span>
+                                <span id="display-hari" class="text-lg font-black text-emerald-700 ml-1">Hari ke-0</span>
+                                <span class="text-xs text-slate-400">/ 14 Hari</span>
+                            </div>
+                        </div>
+
+                        <!-- Canvas Workspace -->
+                        <div class="w-full relative bg-slate-900 rounded-xl overflow-hidden shadow-inner border border-slate-800 flex justify-center items-center" style="height: 380px;">
+                            <canvas id="growthCanvas" width="650" height="380" class="w-full h-full object-contain"></canvas>
+                            
+                            <!-- Overlay Text Banner ketika tanaman mati/etiolasi parah -->
+                            <div id="canvas-overlay" class="hidden absolute inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center">
+                                <div class="bg-white/90 px-6 py-4 rounded-xl shadow-2xl text-center max-w-xs border border-red-200">
+                                    <i id="overlay-icon" class="fa-solid fa-triangle-exclamation text-amber-500 text-3xl mb-2"></i>
+                                    <h4 id="overlay-title" class="font-bold text-slate-800 text-sm">Status Pertumbuhan</h4>
+                                    <p id="overlay-desc" class="text-xs text-slate-600 mt-1">Deskripsi status.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- REAL-TIME TELEMETRY PANEL -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">
+                            Parameter Observasi Real-Time (Hari Ini)
+                        </h3>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                            <!-- High Stem -->
+                            <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100">
+                                <div class="text-xs text-slate-500 font-medium mb-1"><i class="fa-solid fa-ruler-vertical text-emerald-600 mr-1"></i> Tinggi Batang</div>
+                                <div id="stat-tinggi" class="text-xl font-bold text-slate-800">0.0 <span class="text-xs font-normal text-slate-500">cm</span></div>
+                            </div>
+
+                            <!-- Leaf Count -->
+                            <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100">
+                                <div class="text-xs text-slate-500 font-medium mb-1"><i class="fa-solid fa-leaf text-emerald-600 mr-1"></i> Jumlah Daun</div>
+                                <div id="stat-daun" class="text-xl font-bold text-slate-800">0 <span class="text-xs font-normal text-slate-500">helai</span></div>
+                            </div>
+
+                            <!-- Leaf Color -->
+                            <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100">
+                                <div class="text-xs text-slate-500 font-medium mb-1"><i class="fa-solid fa-palette text-emerald-600 mr-1"></i> Warna Daun</div>
+                                <div id="stat-warna" class="text-sm font-semibold text-slate-800 truncate">-</div>
+                            </div>
+
+                            <!-- Root Condition -->
+                            <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100">
+                                <div class="text-xs text-slate-500 font-medium mb-1"><i class="fa-solid fa-seedling text-emerald-600 mr-1"></i> Kondisi Akar</div>
+                                <div id="stat-akar" class="text-sm font-semibold text-slate-800 truncate">-</div>
+                            </div>
+                        </div>
+
+                        <!-- Ringkasan Fenomena Fisiologis -->
+                        <div class="mt-4 p-3 bg-emerald-50 rounded-xl border border-emerald-100 text-xs text-emerald-900 flex items-start gap-2.5">
+                            <i class="fa-solid fa-circle-info text-emerald-600 text-base mt-0.5"></i>
+                            <div>
+                                <span class="font-bold">Analisis Fisiologis Sementara: </span>
+                                <span id="stat-fisiologi">Silakan jalankan simulasi untuk melihat perkembangan fisiologis tumbuhan.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= SECTION 2: PANDUAN & TEORI ================= -->
+        <section id="section-teori" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-8">
+                
+                <!-- Title Header -->
+                <div class="border-b border-slate-100 pb-4">
+                    <h2 class="text-2xl font-bold text-slate-900 flex items-center gap-3">
+                        <i class="fa-solid fa-book-bookmark text-emerald-600"></i> Landasan Teori Pertumbuhan & Perkembangan
+                    </h2>
+                    <p class="text-sm text-slate-500 mt-1">
+                        Materi Biologi Fase F / Kelas XII - Pengenalan Perkecambahan & Faktor-Faktor Pengaruh
+                    </p>
+                </div>
+
+                <!-- Sub-bagian 1: Epigeal vs Hipogeal -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- Epigeal Card -->
+                    <div class="bg-emerald-50/50 rounded-2xl p-6 border border-emerald-100">
+                        <div class="flex items-center gap-3 mb-3">
+                            <span class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-sm">1</span>
+                            <h3 class="text-lg font-bold text-emerald-900">Perkecambahan Epigeal</h3>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed mb-4">
+                            Perkecambahan di mana **hipokotil memanjang** sehingga mengangkat kotiledon (biji) dan plumula (tunas) ke **atas permukaan tanah**.
+                        </p>
+                        <div class="bg-white p-3 rounded-xl border border-emerald-200 text-xs text-slate-600 space-y-1">
+                            <div><strong class="text-emerald-800">Contoh Organisme:</strong> Kacang Hijau (*Vigna radiata*), Kacang Tanah.</div>
+                            <div><strong class="text-emerald-800">Ciri Khas:</strong> Kotiledon terangkat dan hijau lalu menyusut setelah nutrisi habis.</div>
+                        </div>
+                    </div>
+
+                    <!-- Hipogeal Card -->
+                    <div class="bg-teal-50/50 rounded-2xl p-6 border border-teal-100">
+                        <div class="flex items-center gap-3 mb-3">
+                            <span class="w-8 h-8 rounded-lg bg-teal-600 text-white flex items-center justify-center font-bold text-sm">2</span>
+                            <h3 class="text-lg font-bold text-teal-900">Perkecambahan Hipogeal</h3>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed mb-4">
+                            Perkecambahan di mana **epikotil memanjang** sehingga plumula muncul ke atas tanah, sedangkan kotiledon (biji) **tetap tertinggal di dalam tanah**.
+                        </p>
+                        <div class="bg-white p-3 rounded-xl border border-teal-200 text-xs text-slate-600 space-y-1">
+                            <div><strong class="text-teal-800">Contoh Organisme:</strong> Jagung (*Zea mays*), Kacang Kapri.</div>
+                            <div><strong class="text-teal-800">Ciri Khas:</strong> Kotiledon tetap berada di dalam media tanah/tidak terangkat.</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Sub-bagian 2: Faktor Eksternal -->
+                <div>
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-sun text-amber-500"></i> Pengaruh Faktor Eksternal Lingkungan
+                    </h3>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        
+                        <!-- Cahaya & Etiolasi -->
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <h4 class="font-bold text-slate-800 text-sm mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-moon text-indigo-500"></i> Cahaya & Etiolasi
+                            </h4>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Cahaya merusak hormon **Auksin**. Di tempat gelap, auksin aktif maksimal menyebabkan **etiolasi** (batang sangat tinggi, pucat, lemah). Tempat terang menghasilkan tumbuhan kokoh & hijau.
+                            </p>
+                        </div>
+
+                        <!-- Kelembaban / Air -->
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <h4 class="font-bold text-slate-800 text-sm mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-droplet text-blue-500"></i> Air (Imbibisi)
+                            </h4>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Air memicu proses **imbibisi** untuk mengaktifkan enzim metabolik (amilase). Tanpa air biji dorman/kering; air berlebih memicu kebusukan akar karena anaerob.
+                            </p>
+                        </div>
+
+                        <!-- Suhu -->
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <h4 class="font-bold text-slate-800 text-sm mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-temperature-half text-rose-500"></i> Suhu Lingkungan
+                            </h4>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Enzim bekerja optimum pada suhu 25°C–30°C. Suhu dingin (10°C) menonaktifkan kerja enzim, sedangkan suhu sangat tinggi (>40°C) merusak (denaturasi) enzim tumbuhan.
+                            </p>
+                        </div>
+
+                        <!-- Nutrisi NPK -->
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <h4 class="font-bold text-slate-800 text-sm mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-flask-vial text-emerald-500"></i> Nutrisi / Pupuk
+                            </h4>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Element N (Nitrogen), P (Fosfor), K (Kalium) penting untuk sintesis klorofil dan protein. Kekurangan memicu klorosis, berlebih memicu plasmolisis (akar terbakar).
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Langkah Penggunaan Lab Virtual -->
+                <div class="bg-slate-900 text-white rounded-2xl p-6">
+                    <h3 class="text-base font-bold text-emerald-400 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-play"></i> Cara Menggunakan Smart-Growth Lab
+                    </h3>
+                    <ol class="list-decimal list-inside text-xs sm:text-sm text-slate-300 space-y-2">
+                        <li>Buka menu <strong>Laboratorium Virtual</strong>.</li>
+                        <li>Tentukan variabel percobaan pada <strong>Panel Kontrol Variabel</strong> (Biji, Cahaya, Air, Suhu, Nutrisi).</li>
+                        <li>Klik tombol <strong>Mulai</strong> untuk menjalankan pengamatan dari Hari ke-1 hingga Hari ke-14.</li>
+                        <li>Perhatikan animasi perkembangan biji dan parameter real-time di bawah canvas.</li>
+                        <li>Buka menu <strong>Data Logger & Grafik</strong> untuk menganalisis kurva pertumbuhan dan mengunduh/mencetak data hasil eksperimen Anda.</li>
+                    </ol>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- ================= SECTION 3: TABEL & GRAFIK (DATA LOGGER) ================= -->
+        <section id="section-data" class="hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- GRAFIK CHART.JS (LEFT/TOP) -->
+                <div class="lg:col-span-7 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800">Kurva Pertumbuhan Tinggi Tanaman</h3>
+                            <p class="text-xs text-slate-500">Grafik Dinamis (Tinggi Batang vs Hari Pengamatan)</p>
+                        </div>
+                        <span class="text-xs font-semibold bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full">Chart.js Live</span>
+                    </div>
+
+                    <div class="relative w-full h-72 sm:h-80">
+                        <canvas id="growthChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- DATA LOGGER TABLE (RIGHT/BOTTOM) -->
+                <div class="lg:col-span-5 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800">Tabel Rekap Data Harian</h3>
+                            <p class="text-xs text-slate-500">Data kuantitatif & kualitatif terorganisir</p>
+                        </div>
+                        <div class="flex gap-1">
+                            <button onclick="copyTableData()" class="px-2.5 py-1 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg transition" title="Copy Data">
+                                <i class="fa-solid fa-copy"></i> Salin
+                            </button>
+                            <button onclick="window.print()" class="px-2.5 py-1 text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition" title="Print/PDF">
+                                <i class="fa-solid fa-print"></i> Cetak
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Scrollable Table -->
+                    <div class="flex-grow overflow-y-auto max-h-80 border border-slate-100 rounded-xl custom-scrollbar">
+                        <table class="w-full text-left text-xs text-slate-700" id="data-table">
+                            <thead class="bg-slate-100 text-slate-800 uppercase font-bold sticky top-0">
+                                <tr>
+                                    <th class="p-2.5">Hari</th>
+                                    <th class="p-2.5">Tinggi (cm)</th>
+                                    <th class="p-2.5">Daun</th>
+                                    <th class="p-2.5">Kondisi / Warna</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body" class="divide-y divide-slate-100">
+                                <!-- Dynamic rows via JS -->
+                                <tr>
+                                    <td colspan="4" class="text-center p-4 text-slate-400 italic">Belum ada data pengamatan. Jalankan simulasi terlebih dahulu.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- ================= SECTION 4: EVALUASI & KUIS ================= -->
+        <section id="section-kuis" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 max-w-4xl mx-auto">
+                
+                <!-- Kuis Header -->
+                <div class="border-b border-slate-100 pb-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-900 flex items-center gap-3">
+                            <i class="fa-solid fa-clipboard-question text-emerald-600"></i> Evaluasi Pemahaman Konsep
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-1">
+                            Uji pemahaman Anda mengenai fenomena etiolasi, tipe perkecambahan, dan faktor pertumbuhan.
+                        </p>
+                    </div>
+                    <div id="quiz-badge-score" class="hidden sm:flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-4 py-2 rounded-xl text-emerald-800 font-bold text-sm">
+                        <span>Skor Anda:</span>
+                        <span id="final-score" class="text-xl font-black text-emerald-600">0</span> / 100
+                    </div>
+                </div>
+
+                <!-- Quiz Container -->
+                <div id="quiz-container" class="space-y-8">
+                    <!-- Dynamic Questions generated via JS -->
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-6 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <button id="btn-submit-quiz" onclick="submitQuiz()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-xl shadow-md transition">
+                        <i class="fa-solid fa-paper-plane mr-2"></i> Kirim Jawaban & Lihat Hasil
+                    </button>
+                    <button id="btn-reset-quiz" onclick="resetQuiz()" class="hidden w-full sm:w-auto bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-6 rounded-xl transition">
+                        <i class="fa-solid fa-rotate-right mr-2"></i> Coba Lagi
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-6 mt-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 text-center space-y-2">
+            <p class="font-medium text-slate-300">
+                Smart-Growth Lab &copy; 2026 — Dikembangkan oleh <span class="text-emerald-400 font-bold">Mirzawati, S.Pd.</span> (MTsN 5 Bireuen)
+            </p>
+            <p class="text-slate-500">
+                Inovasi Media Pembelajaran Biologi Berbantuan Web-Based Virtual Laboratory untuk Ajang Guru Berprestasi (Gupres).
+            </p>
+        </div>
+    </footer>
+
+
+    <!-- ================= JAVASCRIPT LOGIC ================= -->
+    <script>
+        /* ================= STATE & VARIABLES ================= */
+        let currentTab = 'lab';
+        let isRunning = false;
+        let simInterval = null;
+        let currentDay = 0;
+        let maxDays = 14;
+        let simSpeed = 1000; // ms per day
+
+        // Data Storage per simulasi
+        let historyData = [];
+
+        // Chart.js Instance
+        let growthChartInstance = null;
+
+        /* ================= QUIZ DATA ================= */
+        const quizData = [
+            {
+                id: 1,
+                question: "Pada tumbuhan kacang hijau, saat berkecambah bagian hipokotil memanjang sehingga mengangkat kotiledon dan tunas di atas permukaan tanah. Tipe perkecambahan ini disebut...",
+                options: ["Epigeal", "Hipogeal", "Etiolasi", "Dormansi"],
+                answer: 0,
+                explanation: "Perkecambahan epigeal ditandai dengan memanjangnya hipokotil sehingga kotiledon terangkat ke atas permukaan tanah (contoh: Kacang Hijau)."
+            },
+            {
+                id: 2,
+                question: "Seorang siswa meletakkan pot tanaman di dalam kardus tertutup rapat tanpa cahaya. Setelah 7 hari, tanaman tumbuh sangat tinggi tetapi batangnya lemah dan daunnya berwarna kuning pucat. Fenomena ini dinamakan...",
+                options: ["Fotoperiodisme", "Etiolasi", "Plasmolisis", "Gutasi"],
+                answer: 1,
+                explanation: "Etiolasi adalah pertumbuhan tanaman yang sangat cepat di tempat gelap karena hormon auksin tidak terurai oleh cahaya, namun tanaman menjadi pucat dan lemah karena kekurangan klorofil."
+            },
+            {
+                id: 3,
+                question: "Hormon tumbuhan yang kerjanya terhambat atau rusak jika terkena intensitas cahaya matahari tinggi adalah...",
+                options: ["Sitokinin", "Giberelin", "Auksin", "Asam Absisat"],
+                answer: 2,
+                explanation: "Hormon Auksin bersifat peka terhadap cahaya. Jika terkena cahaya terang, auksin akan terurai/rusak sehingga menghambat laju pemanjangan sel di sisi terpaparnya cahaya."
+            },
+            {
+                id: 4,
+                question: "Mengapa pemberian pupuk NPK dalam dosis yang terlalu berlebihan justru dapat menyebabkan tanaman layu dan mati?",
+                options: [
+                    "Pupuk memblokir masuknya sinar matahari",
+                    "Konsentrasi zat terlarut di luar akar menjadi sangat tinggi sehingga terjadi osmotik air keluar dari akar (plasmolisis/terbakar)",
+                    "Pupuk merusak struktur klorofil secara langsung",
+                    "Suhu tanah meningkat menjadi 100°C"
+                ],
+                answer: 1,
+                explanation: "Pupuk berlebih meningkatkan konsentrasi garam di media tanah secara drastis, menyebabkan cairan dalam sel akar keluar secara osmotik (plasmolisis/akar terbakar)."
+            },
+            {
+                id: 5,
+                question: "Proses masuknya air ke dalam sel-sel biji yang kering untuk mengaktifkan enzim metabolik awal perkecambahan disebut...",
+                options: ["Transpirasi", "Imbibisi", "Difusi Terfasilitasi", "Fotosintesis"],
+                answer: 1,
+                explanation: "Imbibisi adalah penyerapan air oleh biji secara fisika-kimia yang menjadi pemicu awal mengaktifkan enzim amilase untuk memulai perkecambahan."
+            }
+        ];
+
+        /* ================= INITIALIZATION ================= */
+        window.onload = function() {
+            initCanvas();
+            initChart();
+            renderQuiz();
+            resetSimulasi();
+        };
+
+        /* ================= TAB NAVIGATION ================= */
+        function switchTab(tabName) {
+            currentTab = tabName;
+            
+            // Hide all sections
+            document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
+            
+            // Unactive all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'text-white');
+                btn.classList.add('text-emerald-100');
+            });
+
+            // Show selected section & activate button
+            document.getElementById(`section-${tabName}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-${tabName}`);
+            activeBtn.classList.add('active', 'text-white');
+            activeBtn.classList.remove('text-emerald-100');
+
+            // Update chart if switched to data tab
+            if(tabName === 'data' && growthChartInstance) {
+                growthChartInstance.update();
+            }
+        }
+
+        /* ================= SPEED CONTROL ================= */
+        function setSpeed(speedMs) {
+            simSpeed = speedMs;
+            document.querySelectorAll('[id^="spd-"]').forEach(btn => {
+                btn.classList.remove('bg-emerald-600', 'text-white');
+                btn.classList.add('bg-slate-200', 'text-slate-700');
+            });
+            
+            if(speedMs === 1000) document.getElementById('spd-1').className = "px-2.5 py-1 text-xs rounded-lg font-bold bg-emerald-600 text-white";
+            if(speedMs === 500) document.getElementById('spd-2').className = "px-2.5 py-1 text-xs rounded-lg font-bold bg-emerald-600 text-white";
+            if(speedMs === 250) document.getElementById('spd-3').className = "px-2.5 py-1 text-xs rounded-lg font-bold bg-emerald-600 text-white";
+
+            if (isRunning) {
+                clearInterval(simInterval);
+                simInterval = setInterval(stepSimulasi, simSpeed);
+            }
+        }
+
+        /* ================= SIMULATION CORE LOGIC ================= */
+        function toggleSimulasi() {
+            if (isRunning) {
+                pauseSimulasi();
+            } else {
+                if (currentDay >= maxDays) {
+                    resetSimulasi();
+                }
+                startSimulasi();
+            }
+        }
+
+        function startSimulasi() {
+            isRunning = true;
+            document.getElementById('icon-start').className = 'fa-solid fa-pause';
+            document.getElementById('text-start').innerText = 'Jeda';
+            document.getElementById('badge-status').className = 'px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 flex items-center gap-1.5';
+            document.getElementById('badge-status').innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Simulasi Berjalan...';
+            
+            simInterval = setInterval(stepSimulasi, simSpeed);
+        }
+
+        function pauseSimulasi() {
+            isRunning = false;
+            clearInterval(simInterval);
+            document.getElementById('icon-start').className = 'fa-solid fa-play';
+            document.getElementById('text-start').innerText = 'Lanjut';
+            document.getElementById('badge-status').className = 'px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 flex items-center gap-1.5';
+            document.getElementById('badge-status').innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-500"></span> Dijeda';
+        }
+
+        function resetSimulasi() {
+            pauseSimulasi();
+            currentDay = 0;
+            historyData = [];
+            
+            document.getElementById('display-hari').innerText = `Hari ke-0`;
+            document.getElementById('badge-status').className = 'px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 flex items-center gap-1.5';
+            document.getElementById('badge-status').innerHTML = '<span class="w-2 h-2 rounded-full bg-slate-400"></span> Siap Dijalankan';
+            document.getElementById('canvas-overlay').classList.add('hidden');
+
+            // Record initial Day 0
+            recordDataStep();
+            updateUI();
+            drawPlant();
+        }
+
+        function stepSimulasi() {
+            if (currentDay < maxDays) {
+                currentDay++;
+                document.getElementById('display-hari').innerText = `Hari ke-${currentDay}`;
+                recordDataStep();
+                updateUI();
+                drawPlant();
+
+                // Check fatal state (Mati)
+                const state = calculateGrowthState(currentDay);
+                if (state.isDead) {
+                    pauseSimulasi();
+                    document.getElementById('canvas-overlay').classList.remove('hidden');
+                    document.getElementById('overlay-title').innerText = "Pertumbuhan Terhenti / Tanaman Mati";
+                    document.getElementById('overlay-desc').innerText = state.deadReason;
+                }
+            } else {
+                pauseSimulasi();
+                document.getElementById('badge-status').className = 'px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 flex items-center gap-1.5';
+                document.getElementById('badge-status').innerHTML = '<i class="fa-solid fa-check"></i> Simulasi Selesai (Hari 14)';
+            }
+        }
+
+        /* ================= MATHEMATICAL & BIOLOGICAL MODEL ================= */
+        function calculateGrowthState(day) {
+            const biji = document.getElementById('param-biji').value;
+            const cahaya = document.getElementById('param-cahaya').value;
+            const air = document.getElementById('param-air').value;
+            const suhu = document.getElementById('param-suhu').value;
+            const nutrisi = document.getElementById('param-nutrisi').value;
+
+            // 1. Cek Kematian / Failure awal
+            if (suhu === 'panas') {
+                return { height: 0, leaves: 0, leafColor: 'Tidak Tumbuh', root: 'Busuk/Rusak', isDead: true, deadReason: 'Suhu 42°C terlalu panas. Enzim denaturasi, biji gagal berkecambah.', fisiologi: 'Terjadi kerusakan enzim akibat suhu tinggi.' };
+            }
+            if (air === 'kering') {
+                return { height: 0, leaves: 0, leafColor: 'Kering', root: 'Kerdil', isDead: true, deadReason: 'Media terlalu kering. Imbibisi air tidak terjadi.', fisiologi: 'Tidak ada air untuk memicu imbibisi.' };
+            }
+            if (air === 'tinggi' && day > 3) {
+                return { height: (day * 0.4), leaves: 0, leafColor: 'Kuning Pembusukan', root: 'Membusuk', isDead: true, deadReason: 'Akar tergenang air (kondisi anoksia/anaerob). Akar membusuk.', fisiologi: 'Respirasi akar terganggu karena kekurangan oksigen.' };
+            }
+            if (nutrisi === 'berlebih' && day > 4) {
+                return { height: (day * 0.5), leaves: 1, leafColor: 'Cokelat Layu', root: 'Terbakar/Plasmolisis', isDead: true, deadReason: 'Dosis pupuk berlebih memicu osmotik tinggi (plasmolisis akar).', fisiologi: 'Air keluar dari akar akibat konsentrasi garam media sangat tinggi.' };
+            }
+
+            // 2. Laju pertumbuhan dasar (Height rate in cm/day)
+            let growthRate = 1.2; // Optimal base
+
+            // Suhu Effect
+            if (suhu === 'dingin') growthRate *= 0.3; // Lambat
+
+            // Cahaya Effect (Etiolasi vs Normal)
+            let isEtiolated = false;
+            let leafColor = 'Hijau Segar';
+
+            if (cahaya === 'gelap') {
+                growthRate *= 2.4; // Etiolasi: Tumbuh sangat cepat tapi lemah
+                isEtiolated = true;
+                leafColor = 'Kuning Pucat (Etiolasi)';
+            } else if (cahaya === 'remang') {
+                growthRate *= 1.3;
+                leafColor = 'Hijau Muda';
+            } else {
+                // Terang
+                growthRate *= 1.0;
+                leafColor = 'Hijau Tua Sehat';
+            }
+
+            // Nutrisi Effect
+            if (nutrisi === 'tanpa' && day > 7) {
+                growthRate *= 0.6; // Mulai melambat di minggu ke-2
+            }
+
+            // Hitung Tinggi & Daun
+            let height = day * growthRate;
+            let leaves = 0;
+
+            if (day >= 3) leaves = Math.floor((day - 2) * (isEtiolated ? 0.4 : 0.8));
+            if (leaves > 8) leaves = 8; // Max limit for 14 days demo
+
+            // Root condition
+            let rootCond = 'Sangat Baik & Cabang Lengkap';
+            if (suhu === 'dingin') rootCond = 'Pendek / Lambat';
+            if (isEtiolated) rootCond = 'Lemah & Serabut Sedikit';
+
+            // Fisiologi Notes
+            let fisiologi = 'Pertumbuhan berjalan normal dan sehat.';
+            if (isEtiolated) fisiologi = 'Auksin bekerja maksimal tanpa terurai cahaya, memicu pemanjangan sel cepat tetapi klorofil tidak terbentuk.';
+            if (suhu === 'dingin') fisiologi = 'Metabolisme lambat karena suhu di bawah optimum enzim.';
+            if (nutrisi === 'tanpa' && day > 7) fisiologi = 'Cadangan nutrisi kotiledon habis, pertumbuhan melambat karena minus unsur NPK.';
+
+            return {
+                height: parseFloat(height.toFixed(1)),
+                leaves: leaves,
+                leafColor: leafColor,
+                root: rootCond,
+                isDead: false,
+                isEtiolated: isEtiolated,
+                bijiType: biji,
+                fisiologi: fisiologi
+            };
+        }
+
+        /* ================= RECORD & UPDATE DATA ================= */
+        function recordDataStep() {
+            const state = calculateGrowthState(currentDay);
+            
+            // Push or update history
+            historyData[currentDay] = {
+                day: currentDay,
+                height: state.height,
+                leaves: state.leaves,
+                color: state.leafColor,
+                root: state.root,
+                fisiologi: state.fisiologi
+            };
+
+            updateTableUI();
+            updateChartUI();
+        }
+
+        function updateUI() {
+            const state = calculateGrowthState(currentDay);
+            document.getElementById('stat-tinggi').innerHTML = `${state.height} <span class="text-xs font-normal text-slate-500">cm</span>`;
+            document.getElementById('stat-daun').innerHTML = `${state.leaves} <span class="text-xs font-normal text-slate-500">helai</span>`;
+            document.getElementById('stat-warna').innerText = state.leafColor;
+            document.getElementById('stat-akar').innerText = state.root;
+            document.getElementById('stat-fisiologi').innerText = state.fisiologi;
+        }
+
+        function updateTableUI() {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+
+            historyData.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 border-b border-slate-100';
+                tr.innerHTML = `
+                    <td class="p-2.5 font-semibold text-slate-800">Hari ${item.day}</td>
+                    <td class="p-2.5 text-emerald-700 font-bold">${item.height} cm</td>
+                    <td class="p-2.5">${item.leaves}</td>
+                    <td class="p-2.5 text-xs text-slate-600">${item.color}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateChartUI() {
+            if (!growthChartInstance) return;
+
+            const labels = historyData.map(d => `Hari ${d.day}`);
+            const dataHeight = historyData.map(d => d.height);
+
+            growthChartInstance.data.labels = labels;
+            growthChartInstance.data.datasets[0].data = dataHeight;
+            growthChartInstance.update();
+        }
+
+        /* ================= CANVAS ANIMATION & DRAWING ================= */
+        let canvas, ctx;
+
+        function initCanvas() {
+            canvas = document.getElementById('growthCanvas');
+            ctx = canvas.getContext('2d');
+        }
+
+        function drawPlant() {
+            if (!ctx) return;
+            const width = canvas.width;
+            const height = canvas.height;
+
+            // Clear Canvas
+            ctx.clearRect(0, 0, width, height);
+
+            const state = calculateGrowthState(currentDay);
+            const bijiType = document.getElementById('param-biji').value; // 'kacang_hijau' or 'jagung'
+
+            // Background Environment Sky/Room
+            const cahaya = document.getElementById('param-cahaya').value;
+            if (cahaya === 'gelap') {
+                ctx.fillStyle = '#0f172a'; // Dark Slate
+            } else if (cahaya === 'remang') {
+                ctx.fillStyle = '#334155'; // Muted Slate
+            } else {
+                ctx.fillStyle = '#e0f2fe'; // Bright Sky Blue
+            }
+            ctx.fillRect(0, 0, width, height - 100);
+
+            // Sunlight Lamp Graphic if Terang
+            if (cahaya === 'terang') {
+                ctx.beginPath();
+                ctx.arc(width - 60, 50, 30, 0, Math.PI * 2);
+                ctx.fillStyle = '#fde047';
+                ctx.fill();
+                ctx.shadowColor = '#fde047';
+                ctx.shadowBlur = 20;
+                ctx.fill();
+                ctx.shadowBlur = 0; // reset
+            }
+
+            // Draw Pot and Soil
+            const potTopY = height - 100;
+            
+            // Soil Line
+            ctx.fillStyle = '#451a03'; // Dark Soil Brown
+            ctx.fillRect(0, potTopY, width, 100);
+
+            // Soil Surface Layer
+            ctx.fillStyle = '#78350f';
+            ctx.fillRect(0, potTopY, width, 12);
+
+            // Pot Border Graphic
+            ctx.fillStyle = '#b45309';
+            ctx.beginPath();
+            ctx.moveTo(width / 2 - 120, potTopY);
+            ctx.lineTo(width / 2 + 120, potTopY);
+            ctx.lineTo(width / 2 + 90, height - 10);
+            ctx.lineTo(width / 2 - 90, height - 10);
+            ctx.closePath();
+            ctx.fillStyle = '#d97706';
+            ctx.fill();
+
+            // Soil Top inside Pot
+            ctx.fillStyle = '#3a1805';
+            ctx.beginPath();
+            ctx.ellipse(width / 2, potTopY + 5, 115, 12, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Center Origin for Plant
+            const centerX = width / 2;
+            const groundY = potTopY + 5;
+
+            // Draw Root (Underground)
+            if (currentDay >= 1) {
+                ctx.strokeStyle = state.isDead ? '#78350f' : '#fef3c7';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(centerX, groundY);
+                const rootDepth = Math.min(state.height * 4 + 10, 70);
+                ctx.lineTo(centerX, groundY + rootDepth);
+                
+                // Root branches
+                if (currentDay >= 3) {
+                    ctx.moveTo(centerX, groundY + 15);
+                    ctx.lineTo(centerX - 15, groundY + 30);
+                    ctx.moveTo(centerX, groundY + 25);
+                    ctx.lineTo(centerX + 18, groundY + 45);
+                }
+                ctx.stroke();
+            }
+
+            // If Day 0: Just Seed in Soil
+            if (currentDay === 0) {
+                ctx.fillStyle = bijiType === 'kacang_hijau' ? '#15803d' : '#f59e0b';
+                ctx.beginPath();
+                ctx.arc(centerX, groundY - 4, 8, 0, Math.PI * 2);
+                ctx.fill();
+                return;
+            }
+
+            // Draw Stem & Shoots (Above Ground)
+            const stemPixelHeight = Math.min(state.height * 12, 220); // Scale cm to pixels
+            const stemTopY = groundY - stemPixelHeight;
+
+            // Stem Color based on status
+            let stemColor = '#22c55e'; // Green
+            if (state.isEtiolated) stemColor = '#fef08a'; // Yellowish Etiolated
+            if (state.isDead) stemColor = '#78350f'; // Brown Dead
+
+            ctx.strokeStyle = stemColor;
+            ctx.lineWidth = state.isEtiolated ? 3 : 5;
+            ctx.beginPath();
+            ctx.moveTo(centerX, groundY);
+            
+            // Curved organic stem
+            ctx.quadraticCurveTo(centerX - 5, groundY - (stemPixelHeight / 2), centerX, stemTopY);
+            ctx.stroke();
+
+            // Draw Seed Cotyledon Position (Epigeal vs Hipogeal)
+            if (bijiType === 'kacang_hijau') {
+                // EPIGEAL: Cotyledon lifted up stem
+                const cotyledonY = Math.max(groundY - (stemPixelHeight * 0.7), stemTopY + 15);
+                ctx.fillStyle = state.isDead ? '#78350f' : (state.isEtiolated ? '#fef08a' : '#86efac');
+                
+                // Two lifted cotyledons
+                ctx.beginPath();
+                ctx.arc(centerX - 6, cotyledonY, 6, 0, Math.PI * 2);
+                ctx.arc(centerX + 6, cotyledonY, 6, 0, Math.PI * 2);
+                ctx.fill();
+            } else {
+                // HIPOGEAL: Cotyledon stays underground/at surface
+                ctx.fillStyle = '#f59e0b'; // Corn Seed
+                ctx.beginPath();
+                ctx.arc(centerX, groundY - 4, 8, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Draw Leaves (If any)
+            if (state.leaves > 0 && !state.isDead) {
+                let leafColorHex = '#16a34a'; // Normal Green
+                if (state.isEtiolated) leafColorHex = '#fde047'; // Etiolated Yellow
+
+                ctx.fillStyle = leafColorHex;
+
+                for (let i = 0; i < state.leaves; i++) {
+                    const leafY = stemTopY + (i * 18);
+                    const isLeft = i % 2 === 0;
+                    
+                    ctx.beginPath();
+                    if (isLeft) {
+                        ctx.ellipse(centerX - 14, leafY, 12, 5, -Math.PI / 6, 0, Math.PI * 2);
+                    } else {
+                        ctx.ellipse(centerX + 14, leafY, 12, 5, Math.PI / 6, 0, Math.PI * 2);
+                    }
+                    ctx.fill();
+                }
+            }
+        }
+
+
+        /* ================= CHART.JS INTEGRATION ================= */
+        function initChart() {
+            const ctxChart = document.getElementById('growthChart').getContext('2d');
+            growthChartInstance = new Chart(ctxChart, {
+                type: 'line',
+                data: {
+                    labels: ['Hari 0'],
+                    datasets: [{
+                        label: 'Tinggi Batang (cm)',
+                        data: [0],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#047857'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Tinggi (cm)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Hari Pengamatan'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        /* ================= TABLE EXPORT / COPY ================= */
+        function copyTableData() {
+            let text = "Hari\tTinggi (cm)\tJumlah Daun\tKondisi\n";
+            historyData.forEach(d => {
+                text += `Hari ${d.day}\t${d.height}\t${d.leaves}\t${d.color}\n`;
+            });
+
+            // Use document.execCommand fallback
+            const dummy = document.createElement("textarea");
+            document.body.appendChild(dummy);
+            dummy.value = text;
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+
+            alert("Data tabel pengamatan berhasil disalin ke clipboard!");
+        }
+
+        /* ================= QUIZ LOGIC ================= */
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = '';
+
+            quizData.forEach((q, idx) => {
+                const card = document.createElement('div');
+                card.className = 'bg-slate-50 rounded-2xl p-5 border border-slate-200 space-y-4';
+                
+                let optionsHTML = '';
+                q.options.forEach((opt, oIdx) => {
+                    optionsHTML += `
+                        <label class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 bg-white hover:bg-emerald-50/50 cursor-pointer transition">
+                            <input type="radio" name="question-${q.id}" value="${oIdx}" class="mt-0.5 text-emerald-600 focus:ring-emerald-500">
+                            <span class="text-xs sm:text-sm text-slate-700">${opt}</span>
+                        </label>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <span class="w-7 h-7 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">${idx + 1}</span>
+                        <h4 class="font-bold text-slate-800 text-sm sm:text-base">${q.question}</h4>
+                    </div>
+                    <div class="space-y-2 pl-0 sm:pl-10">
+                        ${optionsHTML}
+                    </div>
+                    <div id="explanation-${q.id}" class="hidden pl-0 sm:pl-10 mt-3 p-3 rounded-xl bg-blue-50 border border-blue-200 text-xs text-blue-900">
+                        <strong><i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i> Pembahasan:</strong> ${q.explanation}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function submitQuiz() {
+            let correctCount = 0;
+            
+            quizData.forEach(q => {
+                const selected = document.querySelector(`input[name="question-${q.id}"]:checked`);
+                const expDiv = document.getElementById(`explanation-${q.id}`);
+                
+                if (expDiv) expDiv.classList.remove('hidden');
+
+                if (selected && parseInt(selected.value) === q.answer) {
+                    correctCount++;
+                }
+            });
+
+            const score = (correctCount / quizData.length) * 100;
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('quiz-badge-score').classList.remove('hidden');
+            document.getElementById('btn-submit-quiz').classList.add('hidden');
+            document.getElementById('btn-reset-quiz').classList.remove('hidden');
+            
+            // Scroll to top of quiz section smoothly
+            document.getElementById('section-kuis').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetQuiz() {
+            renderQuiz();
+            document.getElementById('quiz-badge-score').classList.add('hidden');
+            document.getElementById('btn-submit-quiz').classList.remove('hidden');
+            document.getElementById('btn-reset-quiz').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
